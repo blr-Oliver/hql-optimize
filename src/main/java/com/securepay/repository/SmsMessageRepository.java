@@ -23,10 +23,10 @@ public interface SmsMessageRepository extends JpaRepository<SmsMessage, Integer>
       + "sms.email.id in (select ce.parentId from PayableItem p join p.emails ce where p.hotel.id=:hotelId))")
   List<SmsMessage> getDeliveredSmsMessagesWithNoCost2(@Param("hotelId") int hotelId);
   
-  @Query("select distinct sms, p.id from SmsMessage as sms "
-      + "left outer join HotelEmail as he on sms.email.id = he.id "
+  @Query("select distinct sms from SmsMessage as sms "
       + "left outer join CustomerEmail as ce on sms.email.id = ce.id "
       + "inner join ce.payableItems as p "
+      + "left outer join HotelEmail as he on sms.email.id = he.id "
       + "where "
       + "  sms.status=4 "
       + "  and sms.cost is null "

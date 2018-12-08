@@ -1,5 +1,7 @@
 package com.securepay.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class SmsMessage {
   private int id = -1;
   private Email email;
@@ -10,6 +12,7 @@ public class SmsMessage {
   public int getId() { return id; }
   public void setId(int id) { this.id = id; }
 
+  @JsonIgnore
   public Email getEmail() { return email; }
   public void setEmail(Email email) { this.email = email; }
 

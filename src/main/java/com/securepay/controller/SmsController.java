@@ -1,6 +1,5 @@
 package com.securepay.controller;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +19,6 @@ public class SmsController {
 
   @RequestMapping("/{hotelId}")
   public List<SmsMessage> getDeliveredSmsMessagesWithNoCost(@PathVariable("hotelId") int hotelId) {
-    smsRepo.getDeliveredSmsMessagesWithNoCost(hotelId);
-    smsRepo.getDeliveredSmsMessagesWithNoCost2(hotelId);
-    smsRepo.getDeliveredSmsMessagesWithNoCost3(hotelId);
-    return Collections.emptyList();
+    return smsRepo.getDeliveredSmsMessagesWithNoCost(hotelId);
   }
 }
