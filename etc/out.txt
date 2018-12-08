@@ -1,0 +1,205 @@
+Hibernate: 
+    /* 
+from
+    SmsMessage sms 
+where
+    sms.status=4 
+    and sms.cost is null 
+    and (
+        sms.email.id in (
+            select
+                he.id 
+            from
+                HotelEmail he 
+            where
+                he.hotel.id=:hotelId
+        ) 
+        or sms.email.id in (
+            select
+                ce.id 
+            from
+                CustomerEmail ce 
+            inner join
+                ce.payableItems p 
+            where
+                p.hotel.id=:hotelId
+        )
+    ) */ select
+        smsmessage0_.id as id1_8_,
+        smsmessage0_.email_id as email_id2_8_,
+        smsmessage0_.status as status3_8_,
+        smsmessage0_.cost as cost4_8_,
+        smsmessage0_.messageContent as messageC5_8_ 
+    from
+        SmsMessages smsmessage0_ 
+    where
+        smsmessage0_.status=4 
+        and (
+            smsmessage0_.cost is null
+        ) 
+        and (
+            smsmessage0_.email_id in (
+                select
+                    hotelemail1_.id 
+                from
+                    HotelEmails hotelemail1_ 
+                inner join
+                    Emails hotelemail1_1_ 
+                        on hotelemail1_.id=hotelemail1_1_.id 
+                where
+                    hotelemail1_.hotel_id=?
+            ) 
+            or smsmessage0_.email_id in (
+                select
+                    customerem2_.id 
+                from
+                    CustomerEmails customerem2_ 
+                inner join
+                    Emails customerem2_1_ 
+                        on customerem2_.id=customerem2_1_.id 
+                inner join
+                    PayableItems_CustomerEmails payableite3_ 
+                        on customerem2_.id=payableite3_.customerEmail_id 
+                inner join
+                    PayableItems payableite4_ 
+                        on payableite3_.payableItem_id=payableite4_.id 
+                where
+                    payableite4_.hotel_id=?
+            )
+        )
+--------------------------
+Hibernate: 
+    /* 
+from
+    SmsMessage sms 
+where
+    sms.status=4 
+    and sms.cost is null 
+    and (
+        sms.email.id in (
+            select
+                he.id 
+            from
+                HotelEmail he 
+            where
+                he.hotel.id=:hotelId
+        ) 
+        or sms.email.id in (
+            select
+                ce.parentId 
+            from
+                PayableItem p 
+            join
+                p.emails ce 
+            where
+                p.hotel.id=:hotelId
+        )
+    ) */ select
+        smsmessage0_.id as id1_8_,
+        smsmessage0_.email_id as email_id2_8_,
+        smsmessage0_.status as status3_8_,
+        smsmessage0_.cost as cost4_8_,
+        smsmessage0_.messageContent as messageC5_8_ 
+    from
+        SmsMessages smsmessage0_ 
+    where
+        smsmessage0_.status=4 
+        and (
+            smsmessage0_.cost is null
+        ) 
+        and (
+            smsmessage0_.email_id in (
+                select
+                    hotelemail1_.id 
+                from
+                    HotelEmails hotelemail1_ 
+                inner join
+                    Emails hotelemail1_1_ 
+                        on hotelemail1_.id=hotelemail1_1_.id 
+                where
+                    hotelemail1_.hotel_id=?
+            ) 
+            or smsmessage0_.email_id in (
+                select
+                    customerem4_.id 
+                from
+                    PayableItems payableite2_ 
+                inner join
+                    PayableItems_CustomerEmails emails3_ 
+                        on payableite2_.id=emails3_.payableItem_id 
+                inner join
+                    CustomerEmails customerem4_ 
+                        on emails3_.customerEmail_id=customerem4_.id 
+                inner join
+                    Emails customerem4_1_ 
+                        on customerem4_.id=customerem4_1_.id 
+                where
+                    payableite2_.hotel_id=?
+            )
+        )
+--------------------------
+Hibernate: 
+    /* select
+        distinct sms,
+        p.id 
+    from
+        SmsMessage as sms 
+    left outer join
+        HotelEmail as he 
+            on sms.email.id = he.id 
+    left outer join
+        CustomerEmail as ce 
+            on sms.email.id = ce.id 
+    inner join
+        ce.payableItems as p 
+    where
+        sms.status=4   
+        and sms.cost is null   
+        and (
+            p.hotel.id=:hotelId 
+            or he.hotel.id=:hotelId
+        ) */ select
+            distinct smsmessage0_.id as col_0_0_,
+            payableite4_.id as col_1_0_,
+            smsmessage0_.id as id1_8_,
+            smsmessage0_.email_id as email_id2_8_,
+            smsmessage0_.status as status3_8_,
+            smsmessage0_.cost as cost4_8_,
+            smsmessage0_.messageContent as messageC5_8_ 
+        from
+            SmsMessages smsmessage0_ 
+        left outer join
+            (
+                HotelEmails hotelemail1_ 
+            inner join
+                Emails hotelemail1_1_ 
+                    on hotelemail1_.id=hotelemail1_1_.id
+                ) 
+                    on (
+                        smsmessage0_.email_id=hotelemail1_.id
+                    ) 
+            left outer join
+                (
+                    CustomerEmails customerem2_ 
+                inner join
+                    Emails customerem2_1_ 
+                        on customerem2_.id=customerem2_1_.id
+                    ) 
+                        on (
+                            smsmessage0_.email_id=customerem2_.id
+                        ) 
+                inner join
+                    PayableItems_CustomerEmails payableite3_ 
+                        on customerem2_.id=payableite3_.customerEmail_id 
+                inner join
+                    PayableItems payableite4_ 
+                        on payableite3_.payableItem_id=payableite4_.id 
+                where
+                    smsmessage0_.status=4 
+                    and (
+                        smsmessage0_.cost is null
+                    ) 
+                    and (
+                        payableite4_.hotel_id=? 
+                        or hotelemail1_.hotel_id=?
+                    )
