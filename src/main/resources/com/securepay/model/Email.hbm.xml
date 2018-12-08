@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.securepay.model">
+  <class name="Email" table="Emails" polymorphism="explicit">
+    <id name="id" column="id" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+    <property name="address" column="address" not-null="true" length="1000" />
+  </class>
+</hibernate-mapping>

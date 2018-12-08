@@ -1,0 +1,111 @@
+Existing Hibernate code:
+------------------------
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<SmsMessage> getDeliveredSmsMessagesWithNoCost(Hotel hotel) {
+		log.trace("Getting delivered SMS messages for " + hotel.getName() + " that don't have a cost");
+
+		DetachedCriteria hotelEmailCriteria = DetachedCriteria.forClass(HotelEmail.class)
+				.add(Restrictions.eq("hotel", hotel))
+				.setProjection(Projections.groupProperty("id"));
+
+		DetachedCriteria customerEmailCriteria = DetachedCriteria.forClass(CustomerEmail.class)
+				.createAlias("payableItems", "payableItem")
+				.add(Restrictions.eq("payableItem.hotel", hotel))
+				.setProjection(Projections.groupProperty("id"));
+
+		Criteria criteria = sessionFactory.getCurrentSession()
+				.createCriteria(SmsMessage.class)
+				.add(Restrictions.or(
+						Subqueries.propertyIn("email.id", hotelEmailCriteria),
+						Subqueries.propertyIn("email.id", customerEmailCriteria)))
+				.add(Restrictions.eq("status", SmsStatus.delivered))
+				.add(Restrictions.isNull("cost"));
+		
+		return criteria.list();
+	}
+
+
+
+Generated SQL:
+--------------
+
+select
+        this_.id as id1_104_0_,
+        this_.deleted as deleted2_104_0_,
+        this_.created as created3_104_0_,
+        this_.hidden as hidden4_104_0_,
+        this_.lastModified as lastModi5_104_0_,
+        this_.cost as cost6_104_0_,
+        this_.email_id as email_i12_104_0_,
+        this_.fromNumber as fromNumb7_104_0_,
+        this_.messageContent as messageC8_104_0_,
+        this_.messageId as messageI9_104_0_,
+        this_.status as status10_104_0_,
+        this_.toNumber as toNumbe11_104_0_ 
+    from
+        SmsMessages this_ 
+    where
+        (
+            this_.email_id in (
+                select
+                    this_.id as y0_ 
+                from
+                    HotelEmails this_ 
+                inner join
+                    Emails this_1_ 
+                        on this_.id=this_1_.id 
+                where
+                    this_.hotel_id=4160138 
+                group by
+                    this_.id
+            ) 
+            or this_.email_id in (
+                select
+                    this_.id as y0_ 
+                from
+                    CustomerEmails this_ 
+                inner join
+                    Emails this_1_ 
+                        on this_.id=this_1_.id 
+                inner join
+                    PayableItems_CustomerEmails payableite3_ 
+                        on this_.id=payableite3_.customerEmail_id 
+                inner join
+                    PayableItems payableite1_ 
+                        on payableite3_.payableItem_id=payableite1_.id 
+                left outer join
+                    Bookings payableite1_1_ 
+                        on payableite1_.id=payableite1_1_.id 
+                left outer join
+                    ManualEmails payableite1_2_ 
+                        on payableite1_.id=payableite1_2_.id 
+                left outer join
+                    UpsellItems payableite1_3_ 
+                        on payableite1_.id=payableite1_3_.id 
+                where
+                    payableite1_.hotel_id=4160138
+                group by
+                    this_.id
+            )
+        ) 
+        and this_.status=4 
+        and this_.cost is null;
+        
+        
+        
+Query Execution Explanation: (needs viewing in editor with tab stops)
+----------------------------
+
+1	PRIMARY	this_		ALL					239710	1	Using where
+3	SUBQUERY	payableite1_		ref	PRIMARY,FKg3dmvub1jgkt38501ff1utw95	FKg3dmvub1jgkt38501ff1utw95	8	const	72248	100	Using index
+3	SUBQUERY	payableite1_1_		eq_ref	PRIMARY	PRIMARY	8	securepay.payableite1_.id	1	100	Using index
+3	SUBQUERY	payableite1_2_		eq_ref	PRIMARY	PRIMARY	8	securepay.payableite1_.id	1	100	Using index
+3	SUBQUERY	payableite1_3_		eq_ref	PRIMARY	PRIMARY	8	securepay.payableite1_.id	1	100	Using index
+3	SUBQUERY	payableite3_		ref	PRIMARY,FKo7ug6ekgnjots8iv7qkg8evgc	PRIMARY	8	securepay.payableite1_.id	2	100	
+3	SUBQUERY	this_		eq_ref	PRIMARY	PRIMARY	8	securepay.payableite3_.customerEmail_id	1	100	Using index
+3	SUBQUERY	this_1_		eq_ref	PRIMARY	PRIMARY	8	securepay.payableite3_.customerEmail_id	1	100	Using index
+2	SUBQUERY	this_		ref	PRIMARY,FKbap0n06827tduoiyccas034fj	FKbap0n06827tduoiyccas034fj	8	const	52602	100	Using index
+2	SUBQUERY	this_1_		eq_ref	PRIMARY	PRIMARY	8	securepay.this_.id	1	100	Using index
+

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.securepay.model">
+  <joined-subclass extends="Email" name="CustomerEmail" table="CustomerEmails" lazy="true">
+    <key column="id" />
+    <property name="parentId" column="id" generated="always" insert="false" update="false" />
+    <property name="emailType" column="emailType" not-null="false" length="100" />
+    <list name="payableItems" outer-join="false" table="PayableItems_CustomerEmails" lazy="extra">
+      <key column="customerEmail_id" property-ref="parentId" />
+      <list-index column="customerEmail_order" />
+      <many-to-many class="PayableItem" column="payableItem_id" />
+    </list>
+  </joined-subclass>
+</hibernate-mapping>

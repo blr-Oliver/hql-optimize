@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.securepay.model">
+  <class name="Hotel" table="Hotels">
+    <id name="id" column="id" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+    <property name="name" column="name" not-null="true" length="1000" />
+  </class>
+</hibernate-mapping>
